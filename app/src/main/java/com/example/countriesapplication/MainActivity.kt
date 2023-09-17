@@ -1,46 +1,43 @@
 package com.example.countriesapplication
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.countriesapplication.ui.theme.CountriesApplicationTheme
+import android.view.View
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.countriesapplication.di.CountriesApplication
+import com.example.countriesapplication.model.Country
+import com.example.countriesapplication.viewmodel.MainViewModel
+import com.example.countriesapplication.viewmodel.MainViewModelFactory
+import kotlinx.android.synthetic.main.activity_main.countriesList
+import kotlinx.android.synthetic.main.activity_main.swipeRefreshLayout
+import javax.inject.Inject
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
+    private lateinit var mainViewModel: MainViewModel
+    private lateinit var countryList: ArrayList<Country>
+   // private lateinit var countriesAdapter: CountryListAdapter
+
+
+
+    @Inject
+    lateinit var mainViewModelFactory: MainViewModelFactory // Dagger will provide the object to this variable through field injection
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            CountriesApplicationTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Greeting("Android")
-                }
-            }
-        }
-    }
-}
+        setContentView(R.layout.activity_main)
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+        (application as CountriesApplication).applicationComponent.inject(this)
+        // what the above code do is, It will check the file for any of the @Inject property and if there are any
+        // it will inject the correct object to them. Here it is mainViewModelFactory
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    CountriesApplicationTheme {
-        Greeting("Android")
+
+
+
+        mainViewModel = ViewModelProvider(this, mainViewModelFactory)[MainViewModel::class.java]
+
+        countryList = arrayListOf()
+
     }
 }
